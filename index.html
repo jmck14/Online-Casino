@@ -3,58 +3,192 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LuckySpin Casino</title>
+  <title>KV Casino</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-900 text-white">
-  <!-- Navbar -->
-  <nav class="flex justify-between items-center p-6 bg-gray-800 shadow-lg">
-    <h1 class="text-2xl font-bold text-yellow-400">LuckySpin</h1>
-    <div class="space-x-6">
-      <a href="#" class="hover:text-yellow-400">Home</a>
-      <a href="#" class="hover:text-yellow-400">Games</a>
-      <a href="#" class="hover:text-yellow-400">Promotions</a>
-      <a href="#" class="hover:text-yellow-400">Support</a>
-    </div>
-    <button class="bg-yellow-400 text-black px-4 py-2 rounded-xl font-semibold hover:bg-yellow-300">Sign Up</button>
-  </nav>
 
-  <!-- Hero Section -->
-  <section class="text-center py-20 bg-gradient-to-r from-purple-800 to-indigo-900">
-    <h2 class="text-5xl font-bold mb-6">Welcome to LuckySpin Casino</h2>
-    <p class="text-lg mb-8">Play your favorite games and win big!</p>
-    <button class="bg-yellow-400 text-black px-6 py-3 rounded-2xl text-lg font-bold hover:bg-yellow-300">Play Now</button>
-  </section>
+<script>
+let balance = 1000;
 
-  <!-- Games Section -->
-  <section class="p-10">
-    <h3 class="text-3xl font-bold mb-8 text-center">Popular Games</h3>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div class="bg-gray-800 p-6 rounded-2xl shadow-lg hover:scale-105 transition">
-        <h4 class="text-xl font-semibold mb-2">Slots</h4>
-        <p>Spin the reels and hit the jackpot.</p>
-      </div>
-      <div class="bg-gray-800 p-6 rounded-2xl shadow-lg hover:scale-105 transition">
-        <h4 class="text-xl font-semibold mb-2">Blackjack</h4>
-        <p>Test your skills against the dealer.</p>
-      </div>
-      <div class="bg-gray-800 p-6 rounded-2xl shadow-lg hover:scale-105 transition">
-        <h4 class="text-xl font-semibold mb-2">Roulette</h4>
-        <p>Place your bets and watch the wheel spin.</p>
-      </div>
-    </div>
-  </section>
+// NAV
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(sec => sec.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  document.getElementById("balance").innerText = balance;
+}
 
-  <!-- Promotions -->
-  <section class="bg-gray-800 p-10 text-center">
-    <h3 class="text-3xl font-bold mb-6">Special Offers</h3>
-    <p class="mb-4">Get a 100% bonus on your first deposit!</p>
-    <button class="bg-yellow-400 text-black px-6 py-3 rounded-xl font-semibold hover:bg-yellow-300">Claim Bonus</button>
-  </section>
+// =====================
+// SLOTS
+// =====================
+function spinSlots() {
+  const symbols = ["🍒","🍋","🔔","💎","7️⃣"];
+  let r1 = symbols[Math.floor(Math.random()*symbols.length)];
+  let r2 = symbols[Math.floor(Math.random()*symbols.length)];
+  let r3 = symbols[Math.floor(Math.random()*symbols.length)];
 
-  <!-- Footer -->
-  <footer class="bg-gray-900 p-6 text-center text-gray-400">
-    <p>© 2026 LuckySpin Casino. All rights reserved.</p>
-  </footer>
+  document.getElementById("slotResult").innerText = `${r1} | ${r2} | ${r3}`;
+
+  if (r1 === r2 && r2 === r3) {
+    balance += 200;
+    alert("JACKPOT! +200");
+  } else {
+    balance -= 50;
+  }
+
+  document.getElementById("balance").innerText = balance;
+}
+
+// =====================
+// BLACKJACK
+// =====================
+let player = [];
+let dealer = [];
+
+function drawCard() {
+  return Math.floor(Math.random()*11)+1;
+}
+
+function startBlackjack() {
+  player = [drawCard(), drawCard()];
+  dealer = [drawCard(), drawCard()];
+  updateBJ();
+}
+
+function hit() {
+  player.push(drawCard());
+  updateBJ();
+  checkBJ();
+}
+
+function stand() {
+  while (dealer.reduce((a,b)=>a+b,0) < 17) {
+    dealer.push(drawCard());
+  }
+  checkBJ(true);
+}
+
+function updateBJ() {
+  document.getElementById("playerCards").innerText = player.join(" + ");
+  document.getElementById("dealerCards").innerText = dealer.join(" + ");
+}
+
+function score(arr) {
+  return arr.reduce((a,b)=>a+b,0);
+}
+
+function checkBJ(ended=false) {
+  let p = score(player);
+  let d = score(dealer);
+
+  if (p > 21) {
+    balance -= 100;
+    alert("Bust! -100");
+    startBlackjack();
+  } 
+  else if (ended) {
+    if (d > 21 || p > d) {
+      balance += 150;
+      alert("You win +150!");
+    } else {
+      balance -= 100;
+      alert("You lose -100");
+    }
+    startBlackjack();
+  }
+
+  document.getElementById("balance").innerText = balance;
+}
+
+// =====================
+// ROULETTE
+// =====================
+function spinRoulette(choice) {
+  let result = Math.random();
+  let outcome;
+
+  if (result < 0.45) outcome = "red";
+  else if (result < 0.9) outcome = "black";
+  else outcome = "green";
+
+  document.getElementById("rouletteResult").innerText = "Result: " + outcome;
+
+  if (choice === outcome) {
+    balance += (choice === "green") ? 300 : 100;
+    alert("You win!");
+  } else {
+    balance -= 50;
+    alert("You lose");
+  }
+
+  document.getElementById("balance").innerText = balance;
+}
+</script>
+
+<!-- NAV -->
+<nav class="flex justify-between items-center p-6 bg-gray-800">
+  <h1 onclick="showSection('home')" class="text-yellow-400 font-bold text-2xl cursor-pointer">
+    KV Casino
+  </h1>
+  <div class="space-x-4">
+    <button onclick="showSection('home')">Home</button>
+    <button onclick="showSection('games')">Games</button>
+  </div>
+  <div>💰 <span id="balance">1000</span></div>
+</nav>
+
+<!-- HOME -->
+<section id="home" class="section p-10 text-center">
+  <h1 class="text-4xl font-bold">Welcome</h1>
+  <button onclick="showSection('games')" class="mt-6 bg-yellow-400 text-black px-6 py-2 rounded">
+    Play
+  </button>
+</section>
+
+<!-- GAMES MENU -->
+<section id="games" class="section hidden p-10 text-center">
+  <h2 class="text-3xl mb-6">Games</h2>
+
+  <button onclick="showSection('slots')" class="bg-gray-700 p-4 m-2 rounded">Slots</button>
+  <button onclick="showSection('blackjack')" class="bg-gray-700 p-4 m-2 rounded">Blackjack</button>
+  <button onclick="showSection('roulette')" class="bg-gray-700 p-4 m-2 rounded">Roulette</button>
+</section>
+
+<!-- SLOTS -->
+<section id="slots" class="section hidden text-center p-10">
+  <h2 class="text-3xl">Slots</h2>
+  <div id="slotResult" class="text-2xl my-4">🍒 | 🍋 | 🔔</div>
+  <button onclick="spinSlots()" class="bg-yellow-400 text-black px-6 py-2 rounded">Spin</button>
+</section>
+
+<!-- BLACKJACK -->
+<section id="blackjack" class="section hidden text-center p-10">
+  <h2 class="text-3xl">Blackjack</h2>
+
+  <p>Player: <span id="playerCards"></span></p>
+  <p>Dealer: <span id="dealerCards"></span></p>
+
+  <div class="mt-4 space-x-2">
+    <button onclick="hit()" class="bg-green-500 px-4 py-2">Hit</button>
+    <button onclick="stand()" class="bg-red-500 px-4 py-2">Stand</button>
+  </div>
+
+  <button onclick="startBlackjack()" class="mt-4 bg-yellow-400 text-black px-4 py-2 rounded">
+    New Game
+  </button>
+</section>
+
+<!-- ROULETTE -->
+<section id="roulette" class="section hidden text-center p-10">
+  <h2 class="text-3xl">Roulette</h2>
+
+  <div id="rouletteResult" class="my-4">Result: -</div>
+
+  <button onclick="spinRoulette('red')" class="bg-red-500 px-4 py-2 m-1">Red</button>
+  <button onclick="spinRoulette('black')" class="bg-black px-4 py-2 m-1">Black</button>
+  <button onclick="spinRoulette('green')" class="bg-green-500 px-4 py-2 m-1">Green</button>
+</section>
+
 </body>
 </html>
